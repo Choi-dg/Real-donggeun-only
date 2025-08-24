@@ -1,1 +1,17 @@
-# placeholder for config.yaml
+watchlist:
+  - NTRA
+  - CEG
+  - TSLA
+  - TEM
+  - UNH
+
+company_names:
+  NTRA: "Natera"
+  CEG: "Constellation Energy"
+  TSLA: "Tesla"
+  TEM: "Tempus AI"
+  UNH: "UnitedHealth Group"
+
+database_path: "stocks.db"
+fmp_api_key: ""
+default_price_period: "1y"
