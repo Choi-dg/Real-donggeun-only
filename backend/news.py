@@ -1,7 +1,7 @@
 from typing import List, Dict, Optional
 import feedparser, time, urllib.parse
 
-def _google_news_url(query: str, days: int = 7, lang: str = 'en-US', country: str = 'US'):
+def _google_news_url(query: str, days: int = 7, lang: str = 'ko-KR', country: str = 'KR'):
     q = urllib.parse.quote_plus(f"{query} when:{days}d")
     return f"https://news.google.com/rss/search?q={q}&hl={lang}&gl={country}&ceid={country}:{lang}"
 

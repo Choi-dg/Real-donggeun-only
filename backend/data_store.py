@@ -47,7 +47,7 @@ def upsert_quote(db_path: str, row: Dict[str, Any]):
         """ , row)
         conn.commit()
 
-def insert_news_batch(db_path: str, rows: List[Dict[str, Any]]):
+def insert_news_batch(db_path: str, rows: List[Dict,]):
     if not rows:
         return
     with get_conn(db_path) as conn:

@@ -11,6 +11,12 @@ def get_company_name(ticker: str):
     except Exception:
         return None
 
+def _clean(x):
+    if x is None: return None
+    if isinstance(x, float) and math.isnan(x): return None
+    try: return float(x)
+    except Exception: return None
+
 def fetch_snapshot_yf(ticker: str) -> Dict:
     t = yf.Ticker(ticker)
     info = {}
@@ -30,21 +36,12 @@ def fetch_snapshot_yf(ticker: str) -> Dict:
                 price = float(hist['Close'].iloc[-1])
         except Exception:
             price = None
-    pe = info.get('trailingPE')
-    pb = info.get('priceToBook')
-    ev_ebitda = info.get('enterpriseToEbitda')
-    market_cap = info.get('marketCap') or fast.get('market_cap')
-    def clean(x):
-        if x is None: return None
-        if isinstance(x, float) and math.isnan(x): return None
-        try: return float(x)
-        except Exception: return None
     return {
-        'price': clean(price),
-        'pe_ttm': clean(pe),
-        'pb': clean(pb),
-        'ev_ebitda': clean(ev_ebitda),
-        'market_cap': clean(market_cap),
+        'price': _clean(price),
+        'pe_ttm': _clean(info.get('trailingPE')),
+        'pb': _clean(info.get('priceToBook')),
+        'ev_ebitda': _clean(info.get('enterpriseToEbitda')),
+        'market_cap': _clean(info.get('marketCap') or fast.get('market_cap')),
         'provider': 'yfinance'
     }
 

@@ -1,5 +1,4 @@
-\
-import yaml
+import os, yaml
 import pandas as pd
 import streamlit as st
 import matplotlib.pyplot as plt
@@ -10,6 +9,9 @@ from backend.news import fetch_news_for
 from backend.kelly import kelly_fraction
 
 st.set_page_config(page_title="나만의 주식 분석 툴", layout="wide")
+
+if "FMP_API_KEY" in st.secrets:
+    os.environ["FMP_API_KEY"] = st.secrets["FMP_API_KEY"]
 
 CFG_PATH = "config.yaml"
 with open(CFG_PATH, "r", encoding="utf-8") as f:
@@ -44,7 +46,7 @@ if auto_refresh:
     st.sidebar.success("업데이트 완료!")
 
 st.title("📊 나만의 주식 분석 툴")
-st.write("워치리스트를 기준으로 핵심 지표 / 뉴스 / 차트를 한 곳에 모았습니다.")
+st.write("워치리스트를 기준으로 핵심 지표 / 뉴스(한국어) / 차트를 한 곳에 모았습니다.")
 
 tab1, tab2, tab3, tab4 = st.tabs(["기업 스냅샷", "뉴스 피드", "차트", "켈리 계산기"])
 
@@ -53,9 +55,7 @@ with tab1:
     if watchlist:
         rows = query_latest_quotes(DB_PATH, watchlist)
         if rows:
-            import pandas as pd
-            df = pd.DataFrame(rows)
-            df = df.sort_values(["ticker","asof"], ascending=[True, False])
+            df = pd.DataFrame(rows).sort_values(["ticker","asof"], ascending=[True, False])
             df = df.drop_duplicates(subset=["ticker"], keep="first")
             df_display = df[["ticker","asof","price","pe_ttm","pb","ev_ebitda","market_cap","updated_at"]]
             st.dataframe(df_display, use_container_width=True)
@@ -65,7 +65,7 @@ with tab1:
         st.warning("워치리스트가 비어 있습니다. 좌측에서 티커를 추가하세요.")
 
 with tab2:
-    st.subheader("최신 뉴스")
+    st.subheader("최신 뉴스 (한국어)")
     ticker = st.selectbox("티커 선택", options=watchlist, index=0 if watchlist else None)
     if ticker:
         if st.button("이 티커 뉴스 새로고침"):
@@ -94,7 +94,7 @@ with tab3:
         else:
             st.write(f"**{ticker}** 가격 ({period}, {interval})")
             fig, ax = plt.subplots()
-            ax.plot(hist.index, hist['Close'])  # default color
+            ax.plot(hist.index, hist['Close'])
             ax.set_xlabel("Date")
             ax.set_ylabel("Close")
             st.pyplot(fig, clear_figure=True)
@@ -115,7 +115,5 @@ with tab4:
     st.write(f"권장 투자금액(원): **{int(bankroll * f_clipped):,}**")
 
 st.divider()
-st.caption(\"\"\"\
-데이터 출처: Yahoo Finance(yfinance) 및 Google News RSS. FMP API Key가 있으면 일부 지표 정확도가 향상됩니다.
-본 도구는 교육/연구용이며 투자 조언이 아닙니다.
-\"\"\")
+st.caption("""데이터 출처: Yahoo Finance(yfinance) 및 Google News RSS(ko-KR 기본). FMP API Key 지원.
+연구/교육용 샘플입니다. 투자 조언이 아닙니다.""" )
